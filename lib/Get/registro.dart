@@ -6,6 +6,61 @@ import 'package:http/http.dart' as http;
 import 'package:pruebasss/User2.dart';
 
 
+
+class InformacionEventoWidget extends StatelessWidget {
+  const InformacionEventoWidget({Key? key, required this.tipo, required this.etiqueta, required this.descripcion, required this.monto}) : super(key: key);
+  final int tipo;
+  final String etiqueta;
+  final String descripcion;
+  final int monto;
+  /*"id": 0,
+  "tipo": 0,
+  "etiqueta": "string",
+  "descripcion": "string",
+  "monto": 0*/
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        Container(
+
+  alignment: Alignment.center,
+  width: 300,
+  padding: EdgeInsets.all(5.0),
+  margin: EdgeInsets.all(0.0),
+  child: Text(tipo.toString()),
+
+),Container(
+
+  alignment: Alignment.center,
+  width: 300,
+  padding: EdgeInsets.all(5.0),
+  margin: EdgeInsets.all(0.0),
+  child: Text(etiqueta),
+
+),Container(
+
+  alignment: Alignment.center,
+  width: 300,
+  padding: EdgeInsets.all(5.0),
+  margin: EdgeInsets.all(0.0),
+  child: Text(descripcion),
+
+),Container(
+
+  alignment: Alignment.center,
+  width: 300,
+  padding: EdgeInsets.all(5.0),
+  margin: EdgeInsets.all(0.0),
+  child: Text(monto.toString()),
+
+),
+      ],
+    );
+  }
+}
 class Relevancia_get extends StatefulWidget {
   Relevancia_get({Key? key}) : super(key: key);
 
@@ -14,56 +69,50 @@ class Relevancia_get extends StatefulWidget {
 }
 
 class _Relevancia_getState extends State<Relevancia_get> {
-  TextEditingController tituloController = TextEditingController();
-  TextEditingController fechaController = TextEditingController();
-  TextEditingController relevanciaController = TextEditingController();
-  TextEditingController categoriaController = TextEditingController();
-  TextEditingController descripcionController = TextEditingController();
+
+  List<Widget> widgetsListView = [];
   int i = 0;
-  final String url =
-      'https://apiagenda120211108203647.azurewebsites.net/api/Relevancias/';
-  Future<void> getData(String relevancia) async {
-    final response = await http.get(Uri.parse(url + relevancia.toString()), headers: {
+  //final String url =
+    //  'https://apiagenda120211108203647.azurewebsites.net/api/Relevancias/';
+    final String url = "https://contamales.azurewebsites.net/api/Registros";
+  Future<List<dynamic>> getData() async {
+    final response = await http.get(Uri.parse(url), headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     });
     if (response.statusCode == 200) {
       var jsonData = jsonDecode(response.body);
-      print(jsonData);
-      if (vacio == false) {
-        User user = User.fromJson(jsonData[i]);
-        lim = jsonData.length;
+      return jsonData;
 
-        //tituloController.text = 'titulo: ' + user.titulo;
-        tituloController.text = 'Titulo: ' + user.titulo;
-        fechaController.text = 'Fecha:' + user.fecha;
-        if (user.relevancia == 0) {
-          relevanciaController.text = 'Relevancia: Importante';
-        }
-        if (user.relevancia == 1) {
-          relevanciaController.text = 'Relevancia: Secundario';
-        }
-        if (user.categoria == 0) {
-          categoriaController.text = 'Categoria: Personal';
-        }
-        if (user.categoria == 1) {
-          categoriaController.text = 'Categoria: Familiar';
-        }
-        if (user.categoria == 2) {
-          categoriaController.text = 'Categoria: Escolar';
-        }
-        if (user.categoria == 3) {
-          categoriaController.text = 'Categoria: Cumpleaños';
-        }
-
-        descripcionController.text = 'Descripcion: ' + user.descripcion;
-      }
+       
+      
     } else {
       throw Exception('Error al llamar al API');
     }
   }
 
-  int? _value = 0;
+  Future<List> getLista(String relevancia) async {
+    final response = await http.get(Uri.parse(url + relevancia), headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    });
+    if (response.statusCode == 200) {
+      var jsonData = jsonDecode(response.body);
+      return jsonData;
+
+    } else {
+      throw Exception('Error al llamar al API');
+    }
+  }
+
+ List<Widget> generarWidgets(List<dynamic> lista){
+
+  List<Widget> widgets = [Text("a")];
+  for(int i=0; i<lista.length; i++) {
+    widgets.add( InformacionEventoWidget(tipo: lista[i]["tipo"], etiqueta: lista[i]["etiqueta"], descripcion: lista[i]["descripcion"], monto: lista[i]["monto"]),);}
+   return widgets;
+ } //estara asi un rato
+
   bool vacio = false;
   int lim = 100;
   @override
@@ -73,137 +122,56 @@ class _Relevancia_getState extends State<Relevancia_get> {
           centerTitle: true,
           title: Text("MOSTRAR POR RELEVANCIA"),
         ),
-        body: Center(
-            child: SingleChildScrollView(
-                child: Column(children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            //color: Colors.grey[300],
-            width: 300,
-            // height: 70,
-            padding: EdgeInsets.all(5.0),
-            margin: EdgeInsets.all(0.0),
-            child: DropdownButtonFormField(
-              alignment: Alignment.center,
-              decoration: InputDecoration(
-                hintText: 'RELEVANCIA',
-                prefixIcon: Icon(Icons.event),
-                border: OutlineInputBorder(),
-              ),
-              value: _value,
-              items: [
-                DropdownMenuItem(
-                  child: Text("IMPORTANTE"),
-                  value: 0,
-                ),
-                DropdownMenuItem(
-                  child: Text("SECUNDARIO"),
-                  value: 1,
-                ),
-              ],
-              onChanged: (int? value) {
-                setState(() {
-                  _value = value;
-                  i = -1;
-                });
-              },
-            ),
+        body: Container(
+          height: MediaQuery.of(context).size.height*0.8,
+          child: Column(
+            children: [ ElevatedButton(
+              child: Text('Siguiente'),
+                        onPressed: ()  async{print("queso");
+
+
+                    List<dynamic> datos =await  getData();
+                    print("Api Sirvio");
+                    print(datos);
+                    setState(() {
+                      widgetsListView = generarWidgets(datos);
+                    });},),
+
+                  Container(height: 500, child: ListView( children: widgetsListView,))
+            ],
+            /*
+              child: SingleChildScrollView(
+                  child: Column(children: <Widget>[
+            
+             
+           ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.pink[600],
+                      onPrimary: Colors.white,
+                      minimumSize: Size(200, 70),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20))),
+                  onPressed: ()  async{
+                    List<dynamic> datos =await  getData();
+                    setState(() {
+                      widgetsListView = generarWidgets(datos);
+                    });
+
+                  },
+                  child: Text('Siguiente',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 17, color: Colors.white),
+                        textScaleFactor: 1,),),
+
+            Container(child: ListView(children: this.widgetsListView),),
+            
+
+          
+          ],
+          
+          
           ),
-          Container(
-            alignment: Alignment.center,
-            //color: Colors.grey[300],
-            width: 300,
-            // height: 70,
-            padding: EdgeInsets.all(5.0),
-            margin: EdgeInsets.all(0.0),
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    primary: Colors.pink[600],
-                    onPrimary: Colors.white,
-                    minimumSize: Size(200, 70),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20))),
-                onPressed: () {
-                  if (_value == 0) {
-                    getData('0');
-                  }
-                  if (_value == 1) {
-                    getData('1');
-                  }
-                  i++;
-                  if (i > lim - 1) {
-                    i = 0;
-                  }
-                },
-                child: Text('Siguiente',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 17, color: Colors.white),
-                      textScaleFactor: 1,)),
-          ),
-          Container(
-            alignment: Alignment.center,
-            //color: Colors.grey[300],
-            width: 300,
-            // height: 70,
-            padding: EdgeInsets.all(5.0),
-            margin: EdgeInsets.all(0.0),
-            child: TextFormField(
-                controller: tituloController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  hintText: 'TITULO',
-                  prefixIcon: Icon(Icons.event),
-                  border: OutlineInputBorder(),
-                )),
-          ),
-          Container(
-            alignment: Alignment.center,
-            //color: Colors.grey[300],
-            width: 300,
-            // height: 70,
-            padding: EdgeInsets.all(5.0),
-            margin: EdgeInsets.all(0.0),
-            child: TextFormField(
-                controller: fechaController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  hintText: 'FECHA',
-                  prefixIcon: Icon(Icons.event),
-                  border: OutlineInputBorder(),
-                )),
-          ),
-          Container(
-            alignment: Alignment.center,
-            //color: Colors.grey[300],
-            width: 300,
-            // height: 70,
-            padding: EdgeInsets.all(5.0),
-            margin: EdgeInsets.all(0.0),
-            child: TextFormField(
-                controller: categoriaController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  hintText: 'CATEGORIA',
-                  prefixIcon: Icon(Icons.event),
-                  border: OutlineInputBorder(),
-                )),
-          ),
-          Container(
-            alignment: Alignment.center,
-            //color: Colors.grey[300],
-            width: 300,
-            // height: 70,
-            padding: EdgeInsets.all(5.0),
-            margin: EdgeInsets.all(0.0),
-            child: TextFormField(
-                controller: descripcionController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  hintText: 'DESCRIPCION',
-                  prefixIcon: Icon(Icons.event),
-                  border: OutlineInputBorder(),
-                )),
-          ),
-        ]))));
+          ),*/),
+        ),);
   }
 }
