@@ -1,14 +1,19 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:pruebasss/User2.dart';
-
-
 
 class InformacionEventoWidget extends StatelessWidget {
-  const InformacionEventoWidget({Key? key, required this.tipo, required this.etiqueta, required this.descripcion, required this.monto}) : super(key: key);
+  const InformacionEventoWidget(
+      {Key? key,
+      required this.tipo,
+      required this.etiqueta,
+      required this.descripcion,
+      required this.monto})
+      : super(key: key);
   final int tipo;
   final String etiqueta;
   final String descripcion;
@@ -18,63 +23,67 @@ class InformacionEventoWidget extends StatelessWidget {
   "etiqueta": "string",
   "descripcion": "string",
   "monto": 0*/
-  
 
   @override
   Widget build(BuildContext context) {
     return ListView(
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      shrinkWrap: true,
+      physics: const ClampingScrollPhysics(),
       children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: Container(
+            alignment: Alignment.center,
+            color: Colors.orange,
+            width: 300,
+            padding: const EdgeInsets.all(5.0),
+            margin: const EdgeInsets.all(0.0),
+            child: Text(tipo.toString()),
+          ),
+        ),
         Container(
-
-  alignment: Alignment.center,
-  width: 300,
-  padding: EdgeInsets.all(5.0),
-  margin: EdgeInsets.all(0.0),
-  child: Text(tipo.toString()),
-
-),Container(
-
-  alignment: Alignment.center,
-  width: 300,
-  padding: EdgeInsets.all(5.0),
-  margin: EdgeInsets.all(0.0),
-  child: Text(etiqueta),
-
-),Container(
-
-  alignment: Alignment.center,
-  width: 300,
-  padding: EdgeInsets.all(5.0),
-  margin: EdgeInsets.all(0.0),
-  child: Text(descripcion),
-
-),Container(
-
-  alignment: Alignment.center,
-  width: 300,
-  padding: EdgeInsets.all(5.0),
-  margin: EdgeInsets.all(0.0),
-  child: Text(monto.toString()),
-
-),
+          color: Colors.amber,
+          alignment: Alignment.center,
+          width: 300,
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.all(0.0),
+          child: Text(etiqueta),
+        ),
+        Container(
+          color: Colors.amber[300],
+          alignment: Alignment.center,
+          width: 300,
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.all(0.0),
+          child: Text(descripcion),
+        ),
+        Container(
+          color: Colors.amber[100],
+          alignment: Alignment.center,
+          width: 300,
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.all(0.0),
+          child: Text(monto.toString()),
+        ),
       ],
     );
   }
 }
+
 class Relevancia_get extends StatefulWidget {
-  Relevancia_get({Key? key}) : super(key: key);
+  const Relevancia_get({Key? key}) : super(key: key);
 
   @override
   _Relevancia_getState createState() => _Relevancia_getState();
 }
 
 class _Relevancia_getState extends State<Relevancia_get> {
-
-  List<Widget> widgetsListView = [];
+  List widgetsListView = [];
   int i = 0;
   //final String url =
-    //  'https://apiagenda120211108203647.azurewebsites.net/api/Relevancias/';
-    final String url = "https://contamales.azurewebsites.net/api/Registros";
+  //  'https://apiagenda120211108203647.azurewebsites.net/api/Relevancias/';
+  final String url = "https://contamales.azurewebsites.net/api/Registros";
   Future<List<dynamic>> getData() async {
     final response = await http.get(Uri.parse(url), headers: {
       'Content-Type': 'application/json',
@@ -83,9 +92,6 @@ class _Relevancia_getState extends State<Relevancia_get> {
     if (response.statusCode == 200) {
       var jsonData = jsonDecode(response.body);
       return jsonData;
-
-       
-      
     } else {
       throw Exception('Error al llamar al API');
     }
@@ -99,47 +105,52 @@ class _Relevancia_getState extends State<Relevancia_get> {
     if (response.statusCode == 200) {
       var jsonData = jsonDecode(response.body);
       return jsonData;
-
     } else {
       throw Exception('Error al llamar al API');
     }
   }
-
- List<Widget> generarWidgets(List<dynamic> lista){
-
-  List<Widget> widgets = [Text("a")];
-  for(int i=0; i<lista.length; i++) {
-    widgets.add( InformacionEventoWidget(tipo: lista[i]["tipo"], etiqueta: lista[i]["etiqueta"], descripcion: lista[i]["descripcion"], monto: lista[i]["monto"]),);}
-   return widgets;
- } //estara asi un rato
 
   bool vacio = false;
   int lim = 100;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("MOSTRAR POR RELEVANCIA"),
-        ),
-        body: Container(
-          height: MediaQuery.of(context).size.height*0.8,
-          child: Column(
-            children: [ ElevatedButton(
-              child: Text('Siguiente'),
-                        onPressed: ()  async{print("queso");
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text("MOSTRAR POR RELEVANCIA"),
+      ),
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.8,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            ElevatedButton(
+              child: const Text('Siguiente'),
+              onPressed: () async {
+                print("queso");
 
-
-                    List<dynamic> datos =await  getData();
-                    print("Api Sirvio");
-                    print(datos);
-                    setState(() {
-                      widgetsListView = generarWidgets(datos);
-                    });},),
-
-                  Container(height: 500, child: ListView( children: widgetsListView,))
-            ],
-            /*
+                List<dynamic> datos = await getData();
+                print("Api Sirvio");
+                print(datos);
+                setState(() {
+                  widgetsListView = datos;
+                });
+              },
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              itemCount: widgetsListView.length,
+              itemBuilder: (BuildContext ctxt, int idx) {
+                return InformacionEventoWidget(
+                    tipo: widgetsListView[idx]["tipo"],
+                    etiqueta: widgetsListView[idx]["etiqueta"],
+                    descripcion: widgetsListView[idx]["descripcion"],
+                    monto: widgetsListView[idx]["monto"]);
+              },
+            )
+          ],
+          /*
               child: SingleChildScrollView(
                   child: Column(children: <Widget>[
             
@@ -171,7 +182,9 @@ class _Relevancia_getState extends State<Relevancia_get> {
           
           
           ),
-          ),*/),
-        ),);
+          ),*/
+        ),
+      ),
+    );
   }
 }
